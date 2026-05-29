@@ -14,3 +14,4 @@ numpy
 flask-cors
 docker
 requests
+gunicorn
