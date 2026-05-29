@@ -180,3 +180,17 @@ class AgentState:
                     f"AgentState has no field '{k}'. "
                     "Add it to the dataclass definition in agent/state.py."
                 )
+
+
+def initial_state(code: str, language: str = "python") -> AgentState:
+    """
+    Create an initial AgentState for starting the optimization pipeline.
+
+    Args:
+        code: The source code to optimize
+        language: Programming language (default: "python")
+
+    Returns:
+        AgentState instance with code and language set
+    """
+    return AgentState(code=code, language=language)

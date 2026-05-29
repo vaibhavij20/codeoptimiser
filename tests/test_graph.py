@@ -1,4 +1,4 @@
-from agent.graph import app
+from agent.graph import compiled_graph as app
 from agent.state import initial_state
 
 
