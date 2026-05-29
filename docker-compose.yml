@@ -3,18 +3,27 @@ version: "3.9"
 services:
 
   app:
-
-    build: .
-
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
-      - "5000:5000"
-
+      - "5001:5001"
     env_file:
       - .env
+    depends_on:
+      - ollama
+    volumes:
+      - ./retrieval:/app/retrieval
+    environment:
+      - PYTHONUNBUFFERED=1
 
   ollama:
-
     image: ollama/ollama
-
     ports:
       - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    restart: unless-stopped
+
+volumes:
+  ollama_data:

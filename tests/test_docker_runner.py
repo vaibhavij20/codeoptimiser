@@ -1,4 +1,7 @@
 """Test Docker sandbox runner functionality."""
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from sandbox.runner import DockerRunner
 
 # Simple test script
@@ -15,15 +18,15 @@ try:
     
     # Check if image exists
     if runner.image_exists():
-        print(f"✅ Sandbox image '{runner.image}' found")
+        print(f"Sandbox image '{runner.image}' found")
     else:
-        print(f"❌ Sandbox image '{runner.image}' not found")
+        print(f"Sandbox image '{runner.image}' not found")
     
     # Run test script
     print("\nRunning test script...")
     output = runner.run(test_script)
-    print(f"✅ Script executed successfully")
+    print(f" Script executed successfully")
     print(f"Output:\n{output}")
     
 except Exception as e:
-    print(f"❌ Error: {e}")
+    print(f" Error: {e}")

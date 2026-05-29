@@ -49,6 +49,8 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 
 GEMINI_MODEL      = "gemini-2.5-flash"
+# For demo deployment, prefer Ollama fallback due to Gemini quota limitations
+DEFAULT_OLLAMA_FIRST = True
 MAX_OUTPUT_TOKENS = 8192
 TEMP_ANALYZE      = 0.2
 TEMP_REFACTOR     = 0.3
@@ -357,6 +359,7 @@ class GeminiClient:
         api_key: Optional[str] = None,
         model: str = GEMINI_MODEL,
         ollama_fallback: bool = True,
+        ollama_first: bool = DEFAULT_OLLAMA_FIRST,
     ) -> None:
         key = api_key or os.getenv("GEMINI_API_KEY")
 
@@ -375,8 +378,9 @@ class GeminiClient:
         self._client = genai.Client(api_key=key)
         self._model = model
         self._ollama_fallback = ollama_fallback
+        self._ollama_first = ollama_first
 
-        logger.info("GeminiClient ready (model=%s)", model)
+        logger.info("GeminiClient ready (model=%s, ollama_first=%s)", model, ollama_first)
 
     # ------------------------------------------------------------------
     # Public API
