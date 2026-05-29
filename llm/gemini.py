@@ -48,7 +48,7 @@ logger = logging.getLogger(__name__)
 # Config
 # ---------------------------------------------------------------------------
 
-GEMINI_MODEL      = "gemini-2.5-flash"
+GEMINI_MODEL      = os.getenv("GEMINI_MODEL", "gemini-2.0-flash")
 MAX_OUTPUT_TOKENS = 8192
 TEMP_ANALYZE      = 0.2
 TEMP_REFACTOR     = 0.3
