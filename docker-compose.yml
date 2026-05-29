@@ -1,0 +1,20 @@
+version: "3.9"
+
+services:
+
+  app:
+
+    build: .
+
+    ports:
+      - "5000:5000"
+
+    env_file:
+      - .env
+
+  ollama:
+
+    image: ollama/ollama
+
+    ports:
+      - "11434:11434"

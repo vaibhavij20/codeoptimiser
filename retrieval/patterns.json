@@ -1,0 +1,11 @@
+[
+  {
+    "id": "P001",
+    "title": "List Comprehension",
+    "description": "Replace append loops with list comprehensions",
+    "embed_text": "replace append loop with list comprehension python optimization",
+    "before": "result=[]\nfor x in nums:\n    result.append(x*x)",
+    "after": "result=[x*x for x in nums]",
+    "tags": ["python", "performance"]
+  }
+]

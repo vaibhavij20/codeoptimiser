@@ -1,0 +1,16 @@
+flask
+langgraph
+
+google-genai
+python-dotenv
+
+pydantic
+pytest
+tenacity
+
+sentence-transformers
+faiss-cpu
+numpy
+flask-cors
+docker
+requests
