@@ -1,6 +1,6 @@
 # Code Optimizer
 
-AI-powered code optimization tool using LangGraph, Gemini/Ollama, and Docker sandboxing.
+Code optimization tool using LangGraph, Gemini/Ollama, and Docker sandboxing.
 
 ## Features
 
