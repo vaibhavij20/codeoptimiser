@@ -34,11 +34,13 @@ Fixes over the original
 
 from __future__ import annotations
 
+import io
 import os
+import sys
 import tempfile
 import textwrap
 import logging
-from typing import Optional
+from typing import Optional, Union
 
 import docker
 import docker.errors
@@ -233,3 +235,69 @@ def _remove_tempfile(path: Optional[str]) -> None:
         os.unlink(path)
     except OSError as exc:
         logger.warning("[DockerRunner] could not remove temp file %s: %s", path, exc)
+
+
+# ---------------------------------------------------------------------------
+# LocalProfiler — in-process fallback (no Docker required)
+# ---------------------------------------------------------------------------
+
+class LocalProfiler:
+    """
+    Executes a profiling script in-process using exec().
+
+    Used automatically on Railway (and any environment where Docker is
+    unavailable) via ``get_profiler()``.
+
+    WARNING: executes arbitrary code — suitable for trusted input only.
+    """
+
+    def run(self, script: str) -> str:
+        """
+        Execute *script* in-process and return its stdout as a string.
+
+        Returns
+        -------
+        str
+            Captured stdout from the script execution.
+        """
+        buf = io.StringIO()
+        old_stdout = sys.stdout
+        sys.stdout = buf
+        try:
+            exec(textwrap.dedent(script), {})  # nosec — trusted input only
+        except Exception as exc:
+            logger.warning("[LocalProfiler] execution error: %s", exc)
+            return f"Execution error: {exc}"
+        finally:
+            sys.stdout = old_stdout
+        return buf.getvalue()
+
+    def __repr__(self) -> str:
+        return "LocalProfiler()"
+
+
+# ---------------------------------------------------------------------------
+# Factory — selects the right profiler for the current environment
+# ---------------------------------------------------------------------------
+
+def get_profiler() -> Union[DockerRunner, LocalProfiler]:
+    """
+    Return the appropriate profiler for the current environment.
+
+    On Railway (``RAILWAY_ENVIRONMENT`` is set), Docker-in-Docker is not
+    available, so ``LocalProfiler`` is returned directly without attempting
+    a Docker connection.  Elsewhere, ``DockerRunner`` is attempted first and
+    ``LocalProfiler`` is used as a fallback if the Docker daemon is
+    unreachable.
+    """
+    if os.getenv("RAILWAY_ENVIRONMENT"):
+        logger.info("[get_profiler] Railway detected — using LocalProfiler")
+        return LocalProfiler()
+
+    try:
+        runner = DockerRunner()
+        logger.info("[get_profiler] Docker available — using DockerRunner")
+        return runner
+    except RuntimeError as exc:
+        logger.warning("[get_profiler] Docker unavailable (%s) — using LocalProfiler", exc)
+        return LocalProfiler()

@@ -34,7 +34,7 @@ from agent.tools import (
 )
 from llm.gemini import GeminiClient
 from retrieval.vectorstore import VectorStore
-from sandbox.runner import DockerRunner
+from sandbox.runner import get_profiler
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +45,7 @@ logger = logging.getLogger(__name__)
 
 _gemini:  GeminiClient | None = None
 _store:   VectorStore  | None = None
-_sandbox: DockerRunner | None = None
+_sandbox = None  # DockerRunner | LocalProfiler
 
 
 def get_gemini() -> GeminiClient:
@@ -62,10 +62,11 @@ def get_store() -> VectorStore:
     return _store
 
 
-def get_sandbox() -> DockerRunner:
+def get_sandbox():
+    """Return the appropriate profiler (Docker or local) for this environment."""
     global _sandbox
     if _sandbox is None:
-        _sandbox = DockerRunner()
+        _sandbox = get_profiler()
     return _sandbox
 
 
@@ -293,7 +294,7 @@ def analyze(state: AgentState) -> dict:
         hotspots=state.get("hotspots") or [],
         profile_report=state.get("profile_report", ""),   # ← comma was missing here
         complexity_metrics=state.get("complexity_metrics") or [],
-        retrieved_patterns=state.get("retrieved_patterns") or [],
+        retrieved_patterns=(state.get("retrieved_patterns") or [])[:5],  # cap at 5 to reduce prompt size
     )
     print(
         f"ANALYZE — got response: "
@@ -363,7 +364,7 @@ def refactor(state: AgentState) -> dict:
     response = get_gemini().refactor(
         source_code=state["code"],
         suggestions=state.get("suggestions") or [],
-        retrieved_patterns=state.get("retrieved_patterns") or [],
+        retrieved_patterns=(state.get("retrieved_patterns") or [])[:5],  # cap at 5 to reduce prompt size
     )
     print(f"REFACTOR — got response: summary={response.change_summary!r}")
 
