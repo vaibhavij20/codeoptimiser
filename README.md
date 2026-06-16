@@ -40,10 +40,7 @@ cp .env.example .env
 docker-compose up --build
 ```
 
-3. **Access the application:**
-- Frontend: http://localhost:5173 (dev) or serve built files
-- Backend API: http://localhost:5001
-- Ollama: http://localhost:11434
+
 
 ### Manual Deployment
 
